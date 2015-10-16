@@ -8014,6 +8014,7 @@ declared; probably to check them for errors."
      ((js2-array-node-p node)
       (dolist (elem (js2-array-node-elems node))
         (when elem
+          (if (js2-infix-node-p elem) (setq elem (js2-infix-node-left elem)))
           (push (js2-define-destruct-symbols
                  elem decl-type face ignore-not-in-block)
                 name-nodes)))
@@ -10365,14 +10366,20 @@ array-literals, array comprehensions and regular expressions."
         (apply #'js2-node-add-children pn (js2-array-node-elems pn)))
        ;; destructuring binding
        (js2-is-in-destructuring
-        (push (if (or (= tt js2-LC)
-                      (= tt js2-LB)
-                      (= tt js2-NAME))
-                  ;; [a, b, c] | {a, b, c} | {a:x, b:y, c:z} | a
-                  (js2-parse-destruct-primary-expr)
-                ;; invalid pattern
+        (push (cond
+               ((and (= tt js2-NAME)
+                     (= js2-ASSIGN (js2-peek-token)))
+                ;; a=defaultValue
+                (js2-parse-initialized-binding (js2-parse-name js2-NAME)))
+               ((or (= tt js2-LC)
+                    (= tt js2-LB)
+                    (= tt js2-NAME))
+                ;; [a, b, c] | {a, b, c} | {a:x, b:y, c:z} | a
+                (js2-parse-destruct-primary-expr))
+               ;; invalid pattern
+               (t
                 (js2-report-error "msg.bad.var")
-                (make-js2-error-node))
+                (make-js2-error-node)))
               elems)
         (setq after-lb-or-comma nil
               after-comma nil))

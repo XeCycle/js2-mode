@@ -181,11 +181,19 @@ the test."
 (js2-deftest-parse destruct-with-initializer-in-object
   "var {a, b = 2, c} = {};")
 
+(js2-deftest-parse destruct-with-initializer-in-array
+  "var [a, b = 2, c] = [];")
+
 (js2-deftest-parse destruct-non-name-target-is-error
   "var {1=1} = {};" :syntax-error "1" :errors-count 1)
 
 (js2-deftest-parse destruct-name-conflict-is-error-in-object
   "\"use strict\";\nvar {a=1,a=2} = {};" :syntax-error "a" :errors-count 1)
+
+(js2-deftest destruct-name-conflict-is-warning-in-array "\"use strict\";\nvar [a=1,a=2] = [];"
+  (js2-mode)
+  (should (equal '("msg.var.redecl" "a")
+                 (caar js2-parsed-warnings))))
 
 ;;; Object literals
 
