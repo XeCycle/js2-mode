@@ -10032,6 +10032,9 @@ handled specially because it is the only one not beginning with a
         (setq pn (js2-parse-function-call pn)))
        ((= tt js2-COLONCOLON)
         (setq pn (js2-parse-binary-bind pn)))
+       ((member tt (list js2-DOT js2-DOTDOT js2-DOTQUERY js2-LB
+                         js2-TEMPLATE_HEAD js2-NO_SUBS_TEMPLATE))
+        (setq pn (js2-parse-member-or-new-expr-tail pn)))
        (t
         (setq continue nil)))))
   pn)
