@@ -377,6 +377,9 @@ the test."
 (js2-deftest-parse bind-operator-chain
   "::a.b :: c :: d;")
 
+(js2-deftest-parse lhs-expr-regression-member-get-after-call
+  "a().b;")
+
 ;;; Automatic semicolon insertion
 
 (js2-deftest-parse no-auto-semi-insertion-after-if
